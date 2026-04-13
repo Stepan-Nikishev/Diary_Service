@@ -29,22 +29,24 @@ internal class Teacher
     private void Check(DiaryServiceAccount account, string paramName)
     {
         if (account == null)
-            throw new ArgumentNullValueException(paramName);//!!
+            throw new ArgumentNullValueException(paramName);
 
         if (!TeacherAccounts.Contains(account))
-            throw new DiaryServiceAccountNotFound();//!!
+            throw new DiaryServiceAccountNotFound();
     }
 
-    public void Grade(DiaryServiceAccount account, Grade grade)
+    public void Grade(DiaryServiceAccount fromAccount, DiaryServiceAccount toAccount, Grade grade)
     {
-        Check(account, nameof(account));
-        account.AddGrade(grade, DateTime.UtcNow);
+        Check(fromAccount, nameof(fromAccount));
+        Check(toAccount, nameof(toAccount));
+        fromAccount.AddGrade(toAccount, grade, DateTime.UtcNow);
     }
 
-    public void Exercise(DiaryServiceAccount account, Exercise exercise)
+    public void Exercise(DiaryServiceAccount fromAccount, DiaryServiceAccount toAccount, Exercise exercise)
     {
-        Check(account, nameof(account));
-        account.AddExercise(exercise, DateTime.UtcNow);
+        Check(fromAccount, nameof(fromAccount));
+        Check(toAccount, nameof(toAccount));
+        fromAccount.AddExercise(toAccount, exercise, DateTime.UtcNow);
     }
 
 

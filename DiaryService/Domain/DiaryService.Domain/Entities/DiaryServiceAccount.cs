@@ -1,16 +1,14 @@
 ﻿using DiaryService.Domain.DiaryService.Domain.Enums;
 using DiaryService.Domain.DiaryService.Domain.Exceptions;
 using DiaryService.Domain.DiaryService.ValueObjects;
-//using System.Diagnostics;
-//using System.Transactions;
 
 namespace DiaryService.Domain.DiaryService.Domain.Entities;
 
-internal class DiaryServiceAccount
+public class DiaryServiceAccount
 {
-    private ICollection<Transaction> transactions = [];
-    public IReadOnlyCollection<Transaction> Transactions =>
-        transactions.ToList<Transaction>();
+    private ICollection<Journal> journal = [];
+    public IReadOnlyCollection<Journal> Journal =>
+        journal.ToList<Journal>();
 
     private static int countAccount = 0;
     public int IdAccount { get; } = countAccount;
@@ -29,31 +27,19 @@ internal class DiaryServiceAccount
         LastName = lastName ?? throw new ArgumentNullValueException(nameof(lastName)); 
     }
 
-    private void CheckTeacherAccountType()
+    public Journal AddGrade(DiaryServiceAccount toAccount, Grade grade, DateTime data)
     {
-        if (Type == DiaryServiceAccountType.Student)
-            throw new DiaryServiceAccountStudentException();
-    }
+        var addedGrade = new Journal(grade, data, JournalStatus.Grade, this, toAccount);
 
-    private void CheckStudentAccountType()
-    {
-        if (Type == DiaryServiceAccountType.Teacher)
-            throw new DiaryServiceAccountTeacherException();
-
-    }
-    public Transaction AddGrade(Grade grade, DateTime data)
-    {
-        var addedGrade = new Transaction(amount, data, note, TransactionStatus.Deposit, this);//транзакции нужнры
-
-        transactions.Add(addedGrade);
+        journal.Add(addedGrade);
         return addedGrade;
     }
 
-    public Transaction AddExercise(Exercise exercise,  DateTime data)
+    public Journal AddExercise(DiaryServiceAccount toAccount, Exercise exercise,  DateTime data)
     {
-        var addedExercise = new Transaction(amount, data, note, TransactionStatus.Deposit, this);//транзакции нужнры
+        var addedExercise = new Journal(data, exercise, JournalStatus.Exercise, this, toAccount);//транзакции нужнры
 
-        transactions.Add(addedExercise);
+        journal.Add(addedExercise);
         return addedExercise;
     }
 }
