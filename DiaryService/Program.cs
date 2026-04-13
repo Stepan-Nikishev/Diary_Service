@@ -1,0 +1,5 @@
+﻿namespace DiaryService;
+void Main
+{
+
+}
