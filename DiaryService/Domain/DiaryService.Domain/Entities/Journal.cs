@@ -34,6 +34,14 @@ public record Journal
         Status = status;
     }
 
+    public Journal(
+        DateTime date,
+        Exercise exercise)
+    {
+        Date = date;
+        Exercise = exercise;
+    }
+
 
     public Journal(
         DateTime date,
@@ -63,7 +71,17 @@ public record Journal
         Destination = destination;
     }
 
-    
+    public Journal(
+       DateTime date,
+       Exercise completedExercise,
+       DiaryServiceAccount source,
+       DiaryServiceAccount destination) : this(date, completedExercise)
+    {
+        Source = source;
+        Destination = destination;
+    }
+
+
     public override string ToString()
         => $"{Grade} {Date} {Exercise}";
 }

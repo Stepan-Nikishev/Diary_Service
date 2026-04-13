@@ -26,7 +26,7 @@ internal class Teacher
         return account;
     }
 
-    private void Check(DiaryServiceAccount account, string paramName)
+    private void CheckTeacher(DiaryServiceAccount account, string paramName)
     {
         if (account == null)
             throw new ArgumentNullValueException(paramName);
@@ -37,15 +37,15 @@ internal class Teacher
 
     public void Grade(DiaryServiceAccount fromAccount, DiaryServiceAccount toAccount, Grade grade)
     {
-        Check(fromAccount, nameof(fromAccount));
-        Check(toAccount, nameof(toAccount));
+        CheckTeacher(fromAccount, nameof(fromAccount));
+        CheckTeacher(toAccount, nameof(toAccount));
         fromAccount.AddGrade(toAccount, grade, DateTime.UtcNow);
     }
 
     public void Exercise(DiaryServiceAccount fromAccount, DiaryServiceAccount toAccount, Exercise exercise)
     {
-        Check(fromAccount, nameof(fromAccount));
-        Check(toAccount, nameof(toAccount));
+        CheckTeacher(fromAccount, nameof(fromAccount));
+        CheckTeacher(toAccount, nameof(toAccount));
         fromAccount.AddExercise(toAccount, exercise, DateTime.UtcNow);
     }
 

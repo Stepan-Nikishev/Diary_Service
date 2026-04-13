@@ -10,12 +10,15 @@ public class DiaryServiceAccount
     public IReadOnlyCollection<Journal> Journal =>
         journal.ToList<Journal>();
 
+    private ICollection<Journal> completedExecise = [];
+    public IReadOnlyCollection<Journal> CompletedExecise =>
+        completedExecise.ToList<Journal>();
+
     private static int countAccount = 0;
     public int IdAccount { get; } = countAccount;
     public FirstName Name { get; private set; }
     public MiddleName MiddleName { get; private set; }
     public LastName LastName { get; private set; }
-    public DiaryServiceAccountType Type { get; private set; }
 
     public DiaryServiceAccount(FirstName name, MiddleName middleName, LastName lastName)
     {
@@ -37,9 +40,22 @@ public class DiaryServiceAccount
 
     public Journal AddExercise(DiaryServiceAccount toAccount, Exercise exercise,  DateTime data)
     {
-        var addedExercise = new Journal(data, exercise, JournalStatus.Exercise, this, toAccount);//транзакции нужнры
+        var addedExercise = new Journal(data, exercise, JournalStatus.Exercise, this, toAccount);
 
         journal.Add(addedExercise);
         return addedExercise;
+    }
+
+    public Journal AddCompletedExercise(DiaryServiceAccount toAccount, Exercise exercise, DateTime data)
+    {
+        var addedCompletedExercise = new Journal(data, exercise, this, toAccount);
+
+        completedExecise.Add(addedCompletedExercise);
+        return addedCompletedExercise;
+    }
+
+    public IReadOnlyList<Journal> ViewJornal(DiaryServiceAccount studentAccount)
+    {
+        return journal.Where(j => j.Destination == studentAccount).ToList().AsReadOnly();
     }
 }
