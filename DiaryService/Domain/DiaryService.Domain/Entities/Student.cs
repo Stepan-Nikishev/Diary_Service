@@ -4,13 +4,13 @@ using DiaryService.Domain.DiaryService.ValueObjects;
 
 namespace DiaryService.Domain.DiaryService.Domain.Entities
 {
-    internal class Student
+    public class Student
     {
         public FirstName Name { get; private set; }
         public MiddleName MiddleName { get; private set; }
         public LastName LastName { get; private set; }
 
-        private ICollection<DiaryServiceAccount> StudentAccounts = new List<DiaryServiceAccount>();
+        private ICollection<DiaryServiceAccount> StudentsAccounts = new List<DiaryServiceAccount>();
 
         public Student(FirstName name, MiddleName middleName, LastName lastName)
         {
@@ -24,28 +24,41 @@ namespace DiaryService.Domain.DiaryService.Domain.Entities
             if (account == null)
                 throw new ArgumentNullValueException(paramName);
 
-            if (!StudentAccounts.Contains(account))
+            if (!StudentsAccounts.Contains(account))
                 throw new DiaryServiceAccountNotFound();
         }
 
         public DiaryServiceAccount CreateStudentAccount(FirstName name, MiddleName middleName, LastName lastName)
         {
             var account = new DiaryServiceAccount(name, middleName, lastName);
-            StudentAccounts.Add(account);
+            StudentsAccounts.Add(account);
             return account;
         }
 
         public void CompletedExercise(DiaryServiceAccount fromAccount, DiaryServiceAccount toAccount, Exercise exercise)
         {
             CheckStudent(fromAccount, nameof(fromAccount));
-            CheckStudent(toAccount, nameof(toAccount));
             fromAccount.AddCompletedExercise(toAccount, exercise, DateTime.UtcNow);
         }
 
-        public void View(DiaryServiceAccount studentAccount)
+        public string ViewJournal(DiaryServiceAccount studentAccount, DiaryServiceAccount teacherAccount)
         {
             CheckStudent(studentAccount, nameof(studentAccount));
-            studentAccount.ViewJornal(studentAccount);
+
+            var entries = teacherAccount.Journal
+                .Where(j => j.Destination != null && j.Destination.IdAccount == studentAccount.IdAccount)
+                .ToList();
+
+            if (!entries.Any())
+                return "У вас пока нет записей от учителя";
+
+            return string.Join("\n", entries.Select(j => j.ToString()));
+        }
+
+        public string ViewMyCompletedExercises(DiaryServiceAccount studentAccount)
+        {
+            CheckStudent(studentAccount, nameof(studentAccount));
+            return studentAccount.GetCompletedExecise();
         }
     }
 }

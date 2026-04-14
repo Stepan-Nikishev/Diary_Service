@@ -3,6 +3,7 @@
     public enum JournalStatus
     {
         Grade,
-        Exercise
+        Exercise,
+        CompletedExercise
     }
 }

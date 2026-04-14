@@ -4,7 +4,7 @@ using DiaryService.Domain.DiaryService.ValueObjects;
 
 namespace DiaryService.Domain.DiaryService.Domain.Entities;
 
-internal class Teacher
+public class Teacher
 {
     public FirstName Name { get; private set; }
     public MiddleName MiddleName { get; private set; }
@@ -38,17 +38,34 @@ internal class Teacher
     public void Grade(DiaryServiceAccount fromAccount, DiaryServiceAccount toAccount, Grade grade)
     {
         CheckTeacher(fromAccount, nameof(fromAccount));
-        CheckTeacher(toAccount, nameof(toAccount));
         fromAccount.AddGrade(toAccount, grade, DateTime.UtcNow);
     }
 
     public void Exercise(DiaryServiceAccount fromAccount, DiaryServiceAccount toAccount, Exercise exercise)
     {
         CheckTeacher(fromAccount, nameof(fromAccount));
-        CheckTeacher(toAccount, nameof(toAccount));
         fromAccount.AddExercise(toAccount, exercise, DateTime.UtcNow);
     }
 
+    public string ViewJournal(DiaryServiceAccount teacherAccount, DiaryServiceAccount studentAccount = null)
+    {
+        CheckTeacher(teacherAccount, nameof(teacherAccount));
+
+        if (studentAccount == null)
+        {
+            return teacherAccount.GetJournal();
+        }
+        else
+        {
+            var entries = teacherAccount.Journal
+                .Where(j => j.Destination != null && j.Destination.IdAccount == studentAccount.IdAccount)
+                .ToList();
+
+            return entries.Any()
+                ? string.Join("\n", entries.Select(j => j.ToString()))
+                : $"У ученика {studentAccount} пока нет записей";
+        }
+    }
 
 
 }
