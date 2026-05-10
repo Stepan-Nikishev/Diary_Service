@@ -1,15 +1,18 @@
-﻿using DiaryService.Domain.DiaryService.Domain.Enums;
+﻿using DiaryService.Domain.DiaryService.Domain.Entities.Base;
+using DiaryService.Domain.DiaryService.Domain.Enums;
 using DiaryService.Domain.DiaryService.Domain.Exceptions;
 using DiaryService.Domain.DiaryService.ValueObjects;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace DiaryService.Domain.DiaryService.Domain.Entities;
 
-public class DiaryServiceAccount
+public class DiaryServiceAccount : Entity<Guid>
 {
-    private ICollection<Journal> journal = [];
+    private readonly ICollection<Journal> journal = [];
     public IReadOnlyCollection<Journal> Journal => journal.ToList().AsReadOnly();
 
-    private ICollection<Journal> completedExecise = [];
+    private readonly ICollection<Journal> completedExecise = [];
     public IReadOnlyCollection<Journal> CompletedExecise => completedExecise.ToList().AsReadOnly();
 
     public string GetJournal() =>
@@ -18,22 +21,12 @@ public class DiaryServiceAccount
     public string GetCompletedExecise() =>
         completedExecise.Any() ? string.Join("\n", completedExecise.Select(c => c.ToString())) : "Нет выполненных заданий";
 
-    public string GetJournalWhereDestination()
-    {
-        var entries = journal.Where(j => j.Destination != null && j.Destination.IdAccount == this.IdAccount).ToList();
-        return entries.Any() ? string.Join("\n", entries.Select(j => j.ToString())) : "У вас пока нет записей";
-    }
-
-    private static int countAccount = 0;
-    public int IdAccount { get; } = countAccount;
     public FirstName Name { get; private set; }
     public MiddleName MiddleName { get; private set; }
     public LastName LastName { get; private set; }
 
-    public DiaryServiceAccount(FirstName name, MiddleName middleName, LastName lastName)
+    public DiaryServiceAccount(FirstName name, MiddleName middleName, LastName lastName) : base(Guid.NewGuid())
     {
-        countAccount++;
-
         Name = name ?? throw new ArgumentNullValueException(nameof(name));
         MiddleName = middleName ?? throw new ArgumentNullValueException(nameof(middleName)); 
         LastName = lastName ?? throw new ArgumentNullValueException(nameof(lastName)); 
@@ -41,21 +34,21 @@ public class DiaryServiceAccount
 
     public Journal AddGrade(DiaryServiceAccount toAccount, Grade grade, DateTime data)
     {
-        var addedGrade = new Journal(grade, data, JournalStatus.Grade, this, toAccount);
+        var addedGrade = new Journal(Guid.NewGuid(), grade, data, this, toAccount);
         journal.Add(addedGrade);
         return addedGrade;
     }
 
     public Journal AddExercise(DiaryServiceAccount toAccount, Exercise exercise, DateTime data)
     {
-        var addedExercise = new Journal(data, exercise, JournalStatus.Exercise, this, toAccount);
+        var addedExercise = new Journal(Guid.NewGuid(), exercise, data, this, toAccount);
         journal.Add(addedExercise);
         return addedExercise;
     }
 
-    public Journal AddCompletedExercise(DiaryServiceAccount toAccount, Exercise exercise, DateTime data)
+    public Journal AddCompletedExercise(DiaryServiceAccount toAccount, Exercise exercise)
     {
-        var addedCompletedExercise = new Journal(data, exercise, this, toAccount);
+        var addedCompletedExercise = new Journal(Guid.NewGuid(), exercise, DateTime.UtcNow, this, toAccount, true);
         completedExecise.Add(addedCompletedExercise);
         journal.Add(addedCompletedExercise);
         return addedCompletedExercise;
@@ -63,6 +56,6 @@ public class DiaryServiceAccount
 
 
     public override string ToString()
-    => $"{Name} {IdAccount}";
+    => $"{Name} {Id}";
 
 }

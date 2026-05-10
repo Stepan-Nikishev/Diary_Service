@@ -38,22 +38,22 @@ class Program
             new MiddleName("Александрович"),
             new LastName("Александров"));
 
-        Console.WriteLine("1. Добавление оценок и заданий:");
-        teacher.Grade(teacherAccount, studentAccount, new Grade(5));
-        teacher.Grade(teacherAccount, studentAccount, new Grade(4));
-        teacher.Exercise(teacherAccount, studentAccount, new Exercise("Решить уравнения"));
-        teacher.Exercise(teacherAccount, studentAccount, new Exercise("Написать сочинение"));
+        Console.WriteLine("1. Добавление оценок и заданий");
+        teacher.Grade(teacherAccount, studentAccount, new Grade(5), new DateTime(2026, 5, 8, 14, 0, 0));
+        teacher.Grade(teacherAccount, studentAccount, new Grade(4), new DateTime(2026, 5, 11, 9, 0, 0));
+        teacher.Exercise(teacherAccount, studentAccount, new Exercise("Решить уравнения"), new DateTime(2026, 5, 8, 14, 0, 0));
+        teacher.Exercise(teacherAccount, studentAccount, new Exercise("Написать сочинение"), new DateTime(2026, 5, 11, 9, 0, 0));
         Console.WriteLine();
 
 
-        Console.WriteLine("1.1 Добавление оценок и заданий другому ученику:");
-        teacher.Grade(teacherAccount, studentAccount2, new Grade(3));
-        teacher.Grade(teacherAccount, studentAccount2, new Grade(2));
-        teacher.Exercise(teacherAccount, studentAccount2, new Exercise("Написать сочинение"));
+        Console.WriteLine("1.1 Добавление оценок и заданий другому ученику");
+        teacher.Grade(teacherAccount, studentAccount2, new Grade(3), new DateTime(2026, 5, 8, 14, 0, 0));
+        teacher.Grade(teacherAccount, studentAccount2, new Grade(2), new DateTime(2026, 5, 11, 8, 0, 0));
+        teacher.Exercise(teacherAccount, studentAccount2, new Exercise("Написать сочинение"), new DateTime(2026, 5, 11, 8, 0, 0));
         Console.WriteLine();
 
 
-        Console.WriteLine("2. Выполнение задания:");
+        Console.WriteLine("2. Выполнение задания");
         student.CompletedExercise(studentAccount, teacherAccount, new Exercise("Решить уравнения"));
         Console.WriteLine();
 
