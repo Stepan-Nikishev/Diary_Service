@@ -12,14 +12,14 @@ public class DiaryServiceAccount : Entity<Guid>
     private readonly ICollection<Journal> journal = [];
     public IReadOnlyCollection<Journal> Journal => journal.ToList().AsReadOnly();
 
-    private readonly ICollection<Journal> completedExecise = [];
-    public IReadOnlyCollection<Journal> CompletedExecise => completedExecise.ToList().AsReadOnly();
+    private readonly ICollection<Journal> completedExercise = [];
+    public IReadOnlyCollection<Journal> CompletedExercise => completedExercise.ToList().AsReadOnly();
 
     public string GetJournal() =>
     journal.Any() ? string.Join("\n", journal.Select(j => j.ToString())) : "Журнал пуст";
 
-    public string GetCompletedExecise() =>
-        completedExecise.Any() ? string.Join("\n", completedExecise.Select(c => c.ToString())) : "Нет выполненных заданий";
+    public string GetCompletedExercise() =>
+        completedExercise.Any() ? string.Join("\n", completedExercise.Select(c => c.ToString())) : "Нет выполненных заданий";
 
     public FirstName Name { get; private set; }
     public MiddleName MiddleName { get; private set; }
@@ -49,7 +49,7 @@ public class DiaryServiceAccount : Entity<Guid>
     public Journal AddCompletedExercise(DiaryServiceAccount toAccount, Exercise exercise)
     {
         var addedCompletedExercise = new Journal(Guid.NewGuid(), exercise, DateTime.UtcNow, this, toAccount, true);
-        completedExecise.Add(addedCompletedExercise);
+        completedExercise.Add(addedCompletedExercise);
         journal.Add(addedCompletedExercise);
         return addedCompletedExercise;
     }

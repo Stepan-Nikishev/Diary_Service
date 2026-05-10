@@ -59,6 +59,6 @@ public class Student : Entity<Guid>
     public string ViewMyCompletedExercises(DiaryServiceAccount studentAccount)
     {
         CheckStudent(studentAccount, nameof(studentAccount));
-        return studentAccount.GetCompletedExecise();
+        return studentAccount.GetCompletedExercise();
     }
 }

@@ -12,8 +12,8 @@ public class Journal : Entity<Guid>
     public DateTime Date { get; }
     public Exercise? Exercise { get; }
     public JournalStatus Status { get; }
-    public DiaryServiceAccount? Source { get; }
-    public DiaryServiceAccount? Destination { get; }
+    public DiaryServiceAccount Source { get; }
+    public DiaryServiceAccount Destination { get; }
 
 
     protected Journal(
