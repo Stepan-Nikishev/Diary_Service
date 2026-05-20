@@ -2,7 +2,6 @@
 using DiaryService.Domain.DiaryService.Domain.Exception;
 using DiaryService.Domain.DiaryService.Domain.Exceptions;
 using DiaryService.Domain.DiaryService.ValueObjects;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DiaryService.Domain.DiaryService.Domain.Entities;
 

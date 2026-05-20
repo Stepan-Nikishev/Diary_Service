@@ -1,9 +1,6 @@
 ﻿using DiaryService.Domain.DiaryService.Domain.Entities.Base;
-using DiaryService.Domain.DiaryService.Domain.Enums;
 using DiaryService.Domain.DiaryService.Domain.Exceptions;
 using DiaryService.Domain.DiaryService.ValueObjects;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 
 namespace DiaryService.Domain.DiaryService.Domain.Entities;
 
