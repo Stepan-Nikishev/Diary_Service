@@ -1,5 +1,4 @@
 ﻿using DiaryService.Domain.DiaryService.Domain.Entities.Base;
-using DiaryService.Domain.DiaryService.Domain.Exception;
 using DiaryService.Domain.DiaryService.Domain.Exceptions;
 using DiaryService.Domain.DiaryService.ValueObjects;
 
@@ -8,57 +7,72 @@ namespace DiaryService.Domain.DiaryService.Domain.Entities;
 public class Student : Entity<Guid>
 {
     public FirstName Name { get; private set; }
+
     public MiddleName MiddleName { get; private set; }
+
     public LastName LastName { get; private set; }
 
-    private ICollection<DiaryServiceAccount> StudentsAccounts = new List<DiaryServiceAccount>();
+    private readonly List<Journal> _journals = [];
+    public IReadOnlyCollection<Journal> Journals =>
+        _journals.AsReadOnly();
 
-    public Student(FirstName name, MiddleName middleName, LastName lastName) : base(Guid.NewGuid())
+    private readonly List<ExerciseRecord> _exercises = [];
+    public IReadOnlyCollection<ExerciseRecord> Exercises =>
+        _exercises.AsReadOnly();
+
+    private Student()
+        : base(Guid.Empty)
+    {
+    }
+
+    public Student(
+        FirstName name,
+        MiddleName middleName,
+        LastName lastName)
+        : base(Guid.NewGuid())
     {
         Name = name;
         MiddleName = middleName;
         LastName = lastName;
     }
 
-    private void CheckStudent(DiaryServiceAccount account, string paramName)
+    internal void ReceiveExercise(ExerciseRecord exercise)
     {
-        if (account == null)
-            throw new ArgumentNullValueException(paramName);
-
-        if (!StudentsAccounts.Contains(account))
-            throw new DiaryServiceAccountNotFound();
+        _exercises.Add(exercise);
     }
 
-    public DiaryServiceAccount CreateStudentAccount(FirstName name, MiddleName middleName, LastName lastName)
+    internal void ReceiveJournal(Journal journal)
     {
-        var account = new DiaryServiceAccount(name, middleName, lastName);
-        StudentsAccounts.Add(account);
-        return account;
+        _journals.Add(journal);
     }
 
-    public void CompletedExercise(DiaryServiceAccount fromAccount, DiaryServiceAccount toAccount, Exercise exercise)
+    public void CompleteExercise(ExerciseRecord exerciseRecord, Exercise completedExercise)
     {
-        CheckStudent(fromAccount, nameof(fromAccount));
-        fromAccount.AddCompletedExercise(toAccount, exercise);
+        if (!_exercises.Contains(exerciseRecord))
+            throw new ExerciseCompletedException();
+
+        exerciseRecord.Complete(completedExercise);
     }
 
-    public string ViewJournal(DiaryServiceAccount studentAccount, DiaryServiceAccount teacherAccount)
+    public string ViewExercises()
     {
-        CheckStudent(studentAccount, nameof(studentAccount));
+        if (!_exercises.Any())
+            return "Нет заданий";
 
-        var entries = teacherAccount.Journal
-            .Where(j => j.Destination != null && j.Destination.Id == studentAccount.Id)
-            .ToList();
-
-        if (!entries.Any())
-            return "У вас пока нет записей от учителя";
-
-        return string.Join("\n", entries.Select(j => j.ToString()));
+        return string.Join(
+            "\n",
+            _exercises.Select(x =>
+                $"Учитель {x.Teacher.Name} {x.Teacher.LastName} " +
+                $"выдал задание: \"{x.Exercise}\""));
     }
 
-    public string ViewMyCompletedExercises(DiaryServiceAccount studentAccount)
+    public string ViewJournal()
     {
-        CheckStudent(studentAccount, nameof(studentAccount));
-        return studentAccount.GetCompletedExercise();
+        if (!_journals.Any())
+            return "Нет оценок";
+
+        return string.Join(
+            "\n",
+            _journals.Select(x => x.GetStudentView()));
     }
 }

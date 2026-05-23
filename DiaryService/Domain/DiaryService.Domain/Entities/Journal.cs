@@ -1,94 +1,68 @@
 ﻿using DiaryService.Domain.DiaryService.Domain.Entities.Base;
-using DiaryService.Domain.DiaryService.Domain.Enums;
 using DiaryService.Domain.DiaryService.ValueObjects;
 
 namespace DiaryService.Domain.DiaryService.Domain.Entities;
 
 public class Journal : Entity<Guid>
 {
-    public Grade? Grade { get; }
-    public DateTime Date { get; }
-    public Exercise? Exercise { get; }
-    public JournalStatus Status { get; }
-    public DiaryServiceAccount Source { get; }
-    public DiaryServiceAccount Destination { get; }
+    public Guid TeacherId { get; private set; }
+    public Teacher Teacher { get; private set; }
 
+    public Guid StudentId { get; private set; }
+    public Student Student { get; private set; }
 
-    protected Journal(
-        Guid id,
-        Grade? grade,
-        Exercise? exercise,
-        DateTime date,
-        JournalStatus status,
-        DiaryServiceAccount source,
-        DiaryServiceAccount destination)
-        : base(id)
-    {
-        Grade = grade;
-        Exercise = exercise;
-        Date = date;
-        Status = status;
-        Source = source;
-        Destination = destination;
-    }
+    public Guid ExerciseId { get; private set; }
+    public ExerciseRecord ExerciseRecord { get; private set; }
 
-    public Journal(Guid id, Grade grade, DateTime date, DiaryServiceAccount source, 
-        DiaryServiceAccount destination)
-    : this(
-        id,
-        grade,
-        null,
-        date,
-        JournalStatus.Grade,
-        source,
-        destination)
+    public int Grade { get; private set; }
+
+    public DateTime GradeDate { get; private set; }
+
+    private Journal()
+        : base(Guid.Empty)
     {
     }
 
-    public Journal(Guid id, Exercise exercise, DateTime date,  DiaryServiceAccount source, 
-        DiaryServiceAccount destination)
-    : this(
-        id,
-        null,
-        exercise,
-        date,
-        JournalStatus.Exercise,
-        source,
-        destination)
+    public Journal(
+        Teacher teacher,
+        Student student,
+        ExerciseRecord exerciseRecord,
+        Grade grade,
+        DateTime gradeDate)
+        : base(Guid.NewGuid())
     {
+        Teacher = teacher;
+        TeacherId = teacher.Id;
+
+        Student = student;
+        StudentId = student.Id;
+
+        ExerciseRecord = exerciseRecord;
+        ExerciseId = exerciseRecord.Id;
+
+        Grade = grade.Value;
+
+        GradeDate = gradeDate;
     }
 
-    public Journal(Guid id, Exercise exercise, DateTime date, DiaryServiceAccount source, 
-        DiaryServiceAccount destination, bool completed)
-    : this(
-        id,
-        null,
-        exercise,
-        date,
-        JournalStatus.CompletedExercise,
-        source,
-        destination)
+    public string GetTeacherView()
     {
+        return
+            $"Студент: {Student.Name} {Student.LastName} " +
+            $"Оценка: {Grade} " +
+            $"Задание: \"{ExerciseRecord.Exercise}\"";
+    }
+
+    public string GetStudentView()
+    {
+        return
+            $"Учитель: {Teacher.Name} {Teacher.LastName} " +
+            $"Оценка: {Grade} " +
+            $"Задание: \"{ExerciseRecord.Exercise}\"";
     }
 
     public override string ToString()
     {
-        switch (Status)
-        {
-            case JournalStatus.Grade:
-                int gradeValue = Grade?.Value ?? 0;
-                return $"[ОЦЕНКА] {Date} | {gradeValue}";
-
-            case JournalStatus.Exercise:
-                string exerciseName = Exercise?.ToString() ?? "нет задания";
-                return $"[ЗАДАНИЕ] {Date} | {exerciseName}";
-
-            case JournalStatus.CompletedExercise:
-                string completedName = Exercise?.ToString() ?? "нет задания";
-                return $"[ВЫПОЛНЕНО] {Date} | {completedName}";
-
-            default:
-                return $"[ЗАПИСЬ] {Date}";
-        }
+        return GetTeacherView();
     }
 }

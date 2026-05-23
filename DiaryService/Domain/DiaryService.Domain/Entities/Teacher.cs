@@ -1,5 +1,4 @@
 ﻿using DiaryService.Domain.DiaryService.Domain.Entities.Base;
-using DiaryService.Domain.DiaryService.Domain.Exception;
 using DiaryService.Domain.DiaryService.Domain.Exceptions;
 using DiaryService.Domain.DiaryService.ValueObjects;
 
@@ -8,65 +7,84 @@ namespace DiaryService.Domain.DiaryService.Domain.Entities;
 public class Teacher : Entity<Guid>
 {
     public FirstName Name { get; private set; }
+
     public MiddleName MiddleName { get; private set; }
+
     public LastName LastName { get; private set; }
 
-    private ICollection<DiaryServiceAccount> TeacherAccounts = new List<DiaryServiceAccount>();
+    private readonly List<Journal> _journals = [];
+    public IReadOnlyCollection<Journal> Journals =>
+        _journals.AsReadOnly();
 
-    public Teacher (FirstName name, MiddleName middleName, LastName lastName):base(Guid.NewGuid())
+    private readonly List<ExerciseRecord> _exercises = [];
+    public IReadOnlyCollection<ExerciseRecord> Exercises =>
+        _exercises.AsReadOnly();
+
+    private Teacher()
+        : base(Guid.Empty)
+    {
+    }
+
+    public Teacher(
+        FirstName name,
+        MiddleName middleName,
+        LastName lastName)
+        : base(Guid.NewGuid())
     {
         Name = name;
         MiddleName = middleName;
         LastName = lastName;
     }
 
-    public DiaryServiceAccount CreateTeacherAccount(FirstName name, MiddleName middleName, LastName lastName)
+    public ExerciseRecord GiveExercise(Student student, Exercise exercise, DateTime date)
     {
-        var account = new DiaryServiceAccount(name, middleName, lastName);
-        TeacherAccounts.Add(account);
-        return account;
+        var exerciseRecord = new ExerciseRecord(this, student, exercise, date);
+
+        _exercises.Add(exerciseRecord);
+
+        student.ReceiveExercise(exerciseRecord);
+
+        return exerciseRecord;
     }
 
-    private void CheckTeacher(DiaryServiceAccount account, string paramName)
+    public Journal GradeStudent(Student student, ExerciseRecord exerciseRecord, Grade grade, DateTime date)
     {
-        if (account == null)
-            throw new ArgumentNullValueException(paramName);
+        if (!exerciseRecord.IsCompleted)
+            throw new ExerciseNotCompletedException();
 
-        if (!TeacherAccounts.Contains(account))
-            throw new DiaryServiceAccountNotFound();
+        if (exerciseRecord.StudentId != student.Id)
+            throw new ExerciseNotBelongException();
+
+        var journal = new Journal(this, student, exerciseRecord, grade, date);
+
+        _journals.Add(journal);
+
+        student.ReceiveJournal(journal);
+
+        exerciseRecord.AddJournal(journal);
+
+        return journal;
     }
 
-    public void Grade(DiaryServiceAccount fromAccount, DiaryServiceAccount toAccount, Grade grade, DateTime data)
+    public string ViewIssuedExercises()
     {
-        CheckTeacher(fromAccount, nameof(fromAccount));
-        fromAccount.AddGrade(toAccount, grade, data);
+        if (!_exercises.Any())
+            return "Нет выданных заданий";
+
+        return string.Join(
+            "\n",
+            _exercises.Select(x =>
+                $"Студенту {x.Student.Name} {x.Student.LastName} " +
+                $"выдано задание: \"{x.Exercise}\""));
     }
 
-    public void Exercise(DiaryServiceAccount fromAccount, DiaryServiceAccount toAccount, Exercise exercise, DateTime data)
+    public string ViewJournal()
     {
-        CheckTeacher(fromAccount, nameof(fromAccount));
-        fromAccount.AddExercise(toAccount, exercise, data);
+        if (!_journals.Any())
+            return "Журнал пуст";
+
+        return string.Join(
+            "\n",
+            _journals.Select(x => x.GetTeacherView()));
     }
-
-    public string ViewJournal(DiaryServiceAccount teacherAccount, DiaryServiceAccount studentAccount = null)
-    {
-        CheckTeacher(teacherAccount, nameof(teacherAccount));
-
-        if (studentAccount == null)
-        {
-            return teacherAccount.GetJournal();
-        }
-        else
-        {
-            var entries = teacherAccount.Journal
-                .Where(j => j.Destination != null && j.Destination.Id == studentAccount.Id)
-                .ToList();
-
-            return entries.Any()
-                ? string.Join("\n", entries.Select(j => j.ToString()))
-                : $"У ученика {studentAccount} пока нет записей";
-        }
-    }
-
-
 }

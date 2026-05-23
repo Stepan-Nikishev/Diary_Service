@@ -11,24 +11,34 @@ public class TeacherConfiguration
 {
     public void Configure(EntityTypeBuilder<Teacher> builder)
     {
+        builder.ToTable("teacher");
+
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .IsRequired();
+            .HasColumnName("id");
 
         builder.Property(x => x.Name)
-            .IsRequired()
-            .HasConversion(name => name.Value, str => new FirstName(str))
-            .HasMaxLength(NameValidator.MAX_LENGTH);
+            .HasColumnName("firstname")
+            .HasConversion(
+                x => x.Value,
+                x => new FirstName(x))
+            .HasMaxLength(NameValidator.MAX_LENGTH)
+            .IsRequired();
 
         builder.Property(x => x.MiddleName)
-            .IsRequired()
-            .HasConversion(middleName => middleName.Value, str => new MiddleName(str))
+            .HasColumnName("middlename")
+            .HasConversion(
+                x => x.Value,
+                x => new MiddleName(x))
             .HasMaxLength(NameValidator.MAX_LENGTH);
 
         builder.Property(x => x.LastName)
-            .IsRequired()
-            .HasConversion(lastName => lastName.Value, str => new LastName(str))
-            .HasMaxLength(NameValidator.MAX_LENGTH);
+            .HasColumnName("lastname")
+            .HasConversion(
+                x => x.Value,
+                x => new LastName(x))
+            .HasMaxLength(NameValidator.MAX_LENGTH)
+            .IsRequired();
     }
 }

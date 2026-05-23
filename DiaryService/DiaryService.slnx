@@ -8,4 +8,7 @@
   <Folder Name="/Infrastructure/">
     <Project Path="Infrastructure/DiaryService.Infrastructure.EntityFramework/DiaryService.Infrastructure.EntityFramework.csproj" />
   </Folder>
+  <Folder Name="/Presentation/">
+    <Project Path="Presentation/DiaryService.WebHost/DiaryService.WebHost.csproj" Id="7beedc99-7ec2-4b31-9146-83fbb3c758c2" />
+  </Folder>
 </Solution>
