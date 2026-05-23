@@ -9,7 +9,7 @@ public abstract class ValueObject<T> : IEquatable<ValueObject<T>>
     protected ValueObject(IValidator<T> validator, T value)
     {
         if (validator == null)
-            throw new ValidatorNullException(nameof(validator));// сделать своё исключение
+            throw new ValidatorNullException(nameof(validator));
         validator.Validate(value);
         Value = value;
     }

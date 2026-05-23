@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DiaryService.ValueObjects\DiaryService.ValueObjects.csproj" />
+  </ItemGroup>
+
 </Project>
