@@ -26,33 +26,28 @@ namespace DiaryService.Infrastructure.EntityFramework.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("exercise_id");
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("CompletedExercise")
-                        .HasColumnType("text")
-                        .HasColumnName("completed_exercise");
-
-                    b.Property<DateTime?>("CompletedExerciseDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("completed_exercise_date");
+                    b.Property<DateTime?>("CompletedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Exercise")
                         .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("exercise");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("ExerciseDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("exercise_date");
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Solution")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<Guid>("StudentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("student_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("TeacherId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("teacher_id");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -60,119 +55,105 @@ namespace DiaryService.Infrastructure.EntityFramework.Migrations
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("exercise", (string)null);
+                    b.ToTable("exercise_records", (string)null);
                 });
 
             modelBuilder.Entity("DiaryService.Domain.DiaryService.Domain.Entities.Journal", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("diary_id");
+                        .HasColumnType("uuid");
 
-                    b.Property<Guid>("ExerciseId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("exercise_id");
+                    b.Property<Guid>("ExerciseRecordId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Grade")
-                        .HasColumnType("integer")
-                        .HasColumnName("grade");
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("GradeDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("grade_date");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("StudentId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("student_id");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("TeacherId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("teacher_id");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExerciseId");
+                    b.HasIndex("ExerciseRecordId");
 
                     b.HasIndex("StudentId");
 
                     b.HasIndex("TeacherId");
 
-                    b.ToTable("diary", (string)null);
+                    b.ToTable("journals", (string)null);
                 });
 
             modelBuilder.Entity("DiaryService.Domain.DiaryService.Domain.Entities.Student", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
-                        .HasColumnName("lastname");
+                        .HasColumnType("character varying(30)");
 
                     b.Property<string>("MiddleName")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
-                        .HasColumnName("middlename");
+                        .HasColumnType("character varying(30)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
-                        .HasColumnName("firstname");
+                        .HasColumnType("character varying(30)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("student", (string)null);
+                    b.ToTable("students", (string)null);
                 });
 
             modelBuilder.Entity("DiaryService.Domain.DiaryService.Domain.Entities.Teacher", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
-                        .HasColumnName("lastname");
+                        .HasColumnType("character varying(30)");
 
                     b.Property<string>("MiddleName")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
-                        .HasColumnName("middlename");
+                        .HasColumnType("character varying(30)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("character varying(30)")
-                        .HasColumnName("firstname");
+                        .HasColumnType("character varying(30)");
 
                     b.HasKey("Id");
 
-                    b.ToTable("teacher", (string)null);
+                    b.ToTable("teachers", (string)null);
                 });
 
             modelBuilder.Entity("DiaryService.Domain.DiaryService.Domain.Entities.ExerciseRecord", b =>
                 {
                     b.HasOne("DiaryService.Domain.DiaryService.Domain.Entities.Student", "Student")
-                        .WithMany("Exercises")
+                        .WithMany("_exercises")
                         .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DiaryService.Domain.DiaryService.Domain.Entities.Teacher", "Teacher")
-                        .WithMany("Exercises")
+                        .WithMany("_exercises")
                         .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Student");
@@ -183,21 +164,21 @@ namespace DiaryService.Infrastructure.EntityFramework.Migrations
             modelBuilder.Entity("DiaryService.Domain.DiaryService.Domain.Entities.Journal", b =>
                 {
                     b.HasOne("DiaryService.Domain.DiaryService.Domain.Entities.ExerciseRecord", "ExerciseRecord")
-                        .WithMany("Journals")
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .WithMany()
+                        .HasForeignKey("ExerciseRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DiaryService.Domain.DiaryService.Domain.Entities.Student", "Student")
-                        .WithMany("Journals")
+                        .WithMany()
                         .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DiaryService.Domain.DiaryService.Domain.Entities.Teacher", "Teacher")
-                        .WithMany("Journals")
+                        .WithMany("_journals")
                         .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ExerciseRecord");
@@ -207,23 +188,16 @@ namespace DiaryService.Infrastructure.EntityFramework.Migrations
                     b.Navigation("Teacher");
                 });
 
-            modelBuilder.Entity("DiaryService.Domain.DiaryService.Domain.Entities.ExerciseRecord", b =>
-                {
-                    b.Navigation("Journals");
-                });
-
             modelBuilder.Entity("DiaryService.Domain.DiaryService.Domain.Entities.Student", b =>
                 {
-                    b.Navigation("Exercises");
-
-                    b.Navigation("Journals");
+                    b.Navigation("_exercises");
                 });
 
             modelBuilder.Entity("DiaryService.Domain.DiaryService.Domain.Entities.Teacher", b =>
                 {
-                    b.Navigation("Exercises");
+                    b.Navigation("_exercises");
 
-                    b.Navigation("Journals");
+                    b.Navigation("_journals");
                 });
 #pragma warning restore 612, 618
         }

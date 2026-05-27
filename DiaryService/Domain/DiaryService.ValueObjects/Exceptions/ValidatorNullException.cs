@@ -1,4 +1,4 @@
 ﻿namespace DiaryService.Domain.DiaryService.ValueObjects.Exceptions;
 
 public class ValidatorNullException(string paramName)
-    : ArgumentNullException(paramName, $"Validator \"{paramName}\" must be specified for type.");
+    : ArgumentNullException(paramName, $"Валидатор \"{paramName}\" не может быть null.");

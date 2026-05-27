@@ -1,63 +1,40 @@
 ﻿using DiaryService.Domain.DiaryService.Domain.Entities;
 using DiaryService.Domain.DiaryService.ValueObjects;
 
-var teacher = new Teacher(
-    new FirstName("Иван"),
-    new MiddleName("Сергеевич"),
-    new LastName("Петров"));
+namespace DiaryService.DomainApp;
 
-var student1 = new Student(
-    new FirstName("Алексей"),
-    new MiddleName("Игоревич"),
-    new LastName("Смирнов"));
+public static class Program
+{
+    public static void Main()
+    {
+        var teacher = new Teacher(
+            new FirstName("Иван"),
+            new MiddleName("Сергеевич"),
+            new LastName("Петров"));
 
-var student2 = new Student(
-    new FirstName("Мария"),
-    new MiddleName("Андреевна"),
-    new LastName("Кузнецова"));
+        var student = new Student(
+            new FirstName("Алексей"),
+            new MiddleName("Дмитриевич"),
+            new LastName("Сидоров"));
 
-var exercise1 = teacher.GiveExercise(
-    student1,
-    new Exercise("Задание1"),
-    DateTime.UtcNow);
+        var exercise = teacher.CreateExercise(
+            student,
+            new Exercise("Задание 1"),
+            DateTime.UtcNow);
 
-var exercise2 = teacher.GiveExercise(
-    student2,
-    new Exercise("Задание2"),
-    DateTime.UtcNow);
+        Console.WriteLine($"Задание: {exercise.Exercise.Value}");
 
-Console.WriteLine();
+        var solution = new Exercise("Решено задание 1");
 
-Console.WriteLine(teacher.ViewIssuedExercises());
+        student.CompleteExercise(exercise, solution);
 
-Console.WriteLine();
+        Console.WriteLine($"Дата выполнения: {exercise.CompletedDate}");
 
-student1.CompleteExercise(
-    exercise1,
-    new Exercise("Задание1 выполнено"));
+        var journal = teacher.EvaluateExercise(
+            exercise,
+            new Grade(5),
+            DateTime.UtcNow);
 
-student2.CompleteExercise(
-    exercise2,
-    new Exercise("Задание2 выполнено"));
-
-teacher.GradeStudent(
-    student1,
-    exercise1,
-    new Grade(5),
-    DateTime.UtcNow);
-
-teacher.GradeStudent(
-    student2,
-    exercise2,
-    new Grade(4),
-    DateTime.UtcNow);
-
-Console.WriteLine(teacher.ViewJournal());
-
-Console.WriteLine();
-
-Console.WriteLine(student1.ViewJournal());
-
-Console.WriteLine();
-
-Console.WriteLine(student2.ViewJournal());
+        Console.WriteLine($"Оценка: {journal.Grade}");
+    }
+}

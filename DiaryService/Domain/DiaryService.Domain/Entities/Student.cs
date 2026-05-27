@@ -12,13 +12,11 @@ public class Student : Entity<Guid>
 
     public LastName LastName { get; private set; }
 
-    private readonly List<Journal> _journals = [];
-    public IReadOnlyCollection<Journal> Journals =>
-        _journals.AsReadOnly();
+    private readonly ICollection<ExerciseRecord> _exercises = [];
 
-    private readonly List<ExerciseRecord> _exercises = [];
     public IReadOnlyCollection<ExerciseRecord> Exercises =>
-        _exercises.AsReadOnly();
+        _exercises.ToList().AsReadOnly();
+
 
     private Student()
         : base(Guid.Empty)
@@ -36,43 +34,13 @@ public class Student : Entity<Guid>
         LastName = lastName;
     }
 
-    internal void ReceiveExercise(ExerciseRecord exercise)
+    public void CompleteExercise(
+        ExerciseRecord exerciseRecord,
+        Exercise solution)
     {
-        _exercises.Add(exercise);
-    }
+        if (exerciseRecord.Student != this)
+            throw new ExerciseNotBelongException();
 
-    internal void ReceiveJournal(Journal journal)
-    {
-        _journals.Add(journal);
-    }
-
-    public void CompleteExercise(ExerciseRecord exerciseRecord, Exercise completedExercise)
-    {
-        if (!_exercises.Contains(exerciseRecord))
-            throw new ExerciseCompletedException();
-
-        exerciseRecord.Complete(completedExercise);
-    }
-
-    public string ViewExercises()
-    {
-        if (!_exercises.Any())
-            return "Нет заданий";
-
-        return string.Join(
-            "\n",
-            _exercises.Select(x =>
-                $"Учитель {x.Teacher.Name} {x.Teacher.LastName} " +
-                $"выдал задание: \"{x.Exercise}\""));
-    }
-
-    public string ViewJournal()
-    {
-        if (!_journals.Any())
-            return "Нет оценок";
-
-        return string.Join(
-            "\n",
-            _journals.Select(x => x.GetStudentView()));
+        exerciseRecord.SetSolution(solution);
     }
 }

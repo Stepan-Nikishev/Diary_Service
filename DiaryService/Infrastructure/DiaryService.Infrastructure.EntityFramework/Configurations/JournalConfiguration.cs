@@ -1,54 +1,44 @@
 ﻿using DiaryService.Domain.DiaryService.Domain.Entities;
+using DiaryService.Domain.DiaryService.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DiaryService.Infrastructure.EntityFramework.Configuretions;
+namespace DiaryService.Infrastructure.EntityFramework.Configurations;
 
 public class JournalConfiguration
     : IEntityTypeConfiguration<Journal>
 {
     public void Configure(EntityTypeBuilder<Journal> builder)
     {
-        builder.ToTable("diary");
+        builder.ToTable("journals");
 
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .HasColumnName("diary_id");
-
-        builder.Property(x => x.TeacherId)
-            .HasColumnName("teacher_id")
             .IsRequired();
 
-        builder.Property(x => x.StudentId)
-            .HasColumnName("student_id")
-            .IsRequired();
-
-        builder.Property(x => x.ExerciseId)
-            .HasColumnName("exercise_id")
-            .IsRequired();
-
-        builder.Property(x => x.Grade)
-            .HasColumnName("grade")
+        builder.Property(j => j.Grade)
+            .HasConversion(
+                v => v.Value,
+                v => new Grade(v))
             .IsRequired();
 
         builder.Property(x => x.GradeDate)
-            .HasColumnName("grade_date")
             .IsRequired();
 
         builder.HasOne(x => x.Teacher)
-            .WithMany(x => x.Journals)
-            .HasForeignKey(x => x.TeacherId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .WithMany("_journals")
+            .HasForeignKey("TeacherId")
+            .HasPrincipalKey(x => x.Id);
 
         builder.HasOne(x => x.Student)
-            .WithMany(x => x.Journals)
-            .HasForeignKey(x => x.StudentId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .WithMany()
+            .HasForeignKey("StudentId")
+            .HasPrincipalKey(x => x.Id);
 
         builder.HasOne(x => x.ExerciseRecord)
-            .WithMany(x => x.Journals)
-            .HasForeignKey(x => x.ExerciseId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .WithMany()
+            .HasForeignKey("ExerciseRecordId")
+            .HasPrincipalKey(x => x.Id);
     }
 }

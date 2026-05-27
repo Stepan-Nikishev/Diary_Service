@@ -12,13 +12,15 @@ public class Teacher : Entity<Guid>
 
     public LastName LastName { get; private set; }
 
-    private readonly List<Journal> _journals = [];
-    public IReadOnlyCollection<Journal> Journals =>
-        _journals.AsReadOnly();
+    private readonly ICollection<ExerciseRecord> _exercises = [];
 
-    private readonly List<ExerciseRecord> _exercises = [];
+    private readonly ICollection<Journal> _journals = [];
+
     public IReadOnlyCollection<ExerciseRecord> Exercises =>
-        _exercises.AsReadOnly();
+        _exercises.ToList().AsReadOnly();
+
+    public IReadOnlyCollection<Journal> Journals =>
+        _journals.ToList().AsReadOnly();
 
     private Teacher()
         : base(Guid.Empty)
@@ -36,55 +38,31 @@ public class Teacher : Entity<Guid>
         LastName = lastName;
     }
 
-    public ExerciseRecord GiveExercise(Student student, Exercise exercise, DateTime date)
+    public ExerciseRecord CreateExercise(
+        Student student,
+        Exercise exercise,
+        DateTime exerciseDate)
     {
-        var exerciseRecord = new ExerciseRecord(this, student, exercise, date);
-
-        _exercises.Add(exerciseRecord);
-
-        student.ReceiveExercise(exerciseRecord);
-
-        return exerciseRecord;
+        return new ExerciseRecord(
+            this,
+            student,
+            exercise,
+            exerciseDate);
     }
 
-    public Journal GradeStudent(Student student, ExerciseRecord exerciseRecord, Grade grade, DateTime date)
+    public Journal EvaluateExercise(
+        ExerciseRecord exerciseRecord,
+        Grade grade,
+        DateTime gradeDate)
     {
         if (!exerciseRecord.IsCompleted)
             throw new ExerciseNotCompletedException();
 
-        if (exerciseRecord.StudentId != student.Id)
-            throw new ExerciseNotBelongException();
-
-        var journal = new Journal(this, student, exerciseRecord, grade, date);
-
-        _journals.Add(journal);
-
-        student.ReceiveJournal(journal);
-
-        exerciseRecord.AddJournal(journal);
-
-        return journal;
-    }
-
-    public string ViewIssuedExercises()
-    {
-        if (!_exercises.Any())
-            return "Нет выданных заданий";
-
-        return string.Join(
-            "\n",
-            _exercises.Select(x =>
-                $"Студенту {x.Student.Name} {x.Student.LastName} " +
-                $"выдано задание: \"{x.Exercise}\""));
-    }
-
-    public string ViewJournal()
-    {
-        if (!_journals.Any())
-            return "Журнал пуст";
-
-        return string.Join(
-            "\n",
-            _journals.Select(x => x.GetTeacherView()));
+        return new Journal(
+            this,
+            exerciseRecord.Student,
+            exerciseRecord,
+            grade,
+            gradeDate);
     }
 }

@@ -6,26 +6,20 @@ namespace DiaryService.Domain.DiaryService.Domain.Entities;
 
 public class ExerciseRecord : Entity<Guid>
 {
-    public Guid TeacherId { get; private set; }
     public Teacher Teacher { get; private set; }
 
-    public Guid StudentId { get; private set; }
     public Student Student { get; private set; }
 
     public Exercise Exercise { get; private set; }
 
-    public Exercise? CompletedExercise { get; private set; }
+    public Exercise? Solution { get; private set; }
 
     public DateTime ExerciseDate { get; private set; }
 
-    public DateTime? CompletedExerciseDate { get; private set; }
+    public DateTime? CompletedDate { get; private set; }
 
     public bool IsCompleted =>
-        CompletedExercise != null;
-
-    private readonly List<Journal> _journals = [];
-    public IReadOnlyCollection<Journal> Journals =>
-        _journals.AsReadOnly();
+        Solution is not null;
 
     private ExerciseRecord()
         : base(Guid.Empty)
@@ -40,28 +34,17 @@ public class ExerciseRecord : Entity<Guid>
         : base(Guid.NewGuid())
     {
         Teacher = teacher;
-        TeacherId = teacher.Id;
-
         Student = student;
-        StudentId = student.Id;
-
         Exercise = exercise;
-
         ExerciseDate = exerciseDate;
     }
 
-    internal void Complete(Exercise completedExercise)
+    internal void SetSolution(Exercise solution)
     {
         if (IsCompleted)
             throw new ExerciseCompletedException();
 
-        CompletedExercise = completedExercise;
-
-        CompletedExerciseDate = DateTime.UtcNow;
-    }
-
-    internal void AddJournal(Journal journal)
-    {
-        _journals.Add(journal);
+        Solution = solution;
+        CompletedDate = DateTime.UtcNow;
     }
 }

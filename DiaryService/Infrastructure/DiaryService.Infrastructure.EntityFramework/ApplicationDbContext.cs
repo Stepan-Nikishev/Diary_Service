@@ -9,9 +9,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<Teacher> Teachers => Set<Teacher>();
 
-    public DbSet<Journal> Diaries => Set<Journal>();
+    public DbSet<ExerciseRecord> ExerciseRecords => Set<ExerciseRecord>();
 
-    public DbSet<ExerciseRecord> Exercises => Set<ExerciseRecord>();
+    public DbSet<Journal> Journals => Set<Journal>();
 
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
